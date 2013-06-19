@@ -12,7 +12,7 @@ module dffa (q, d, clk, resetb, setb);
    end
 endmodule // dffa
 
-module dffa_fixed
+module dffa_fixed(q, d, clk, resetb, setb);   
    output q;
    input  d, clk, resetb, setb;
    reg 	  q;
@@ -24,8 +24,8 @@ module dffa_fixed
    end
 
    // synopsys translate_off
-   always @(rstn or setn)
-     if (rstn && !setn) force q = 1;
+   always @(resetb or setb)
+     if (resetb && !setb) force q = 1;
      else               release q;
    // synopsys translate_on
 endmodule  
