@@ -1,6 +1,6 @@
 // This fifo_sim is not synthesizable, although it may behave decently in simulation
 
-module fifo_sim (rdata, wfull, rempty, wdata, winc, wclk, wreset_b, rinc, rclk, rresetb);
+module fifo_sim (rdata, wfull, rempty, wdata, winc, wclk, wresetb, rinc, rclk, rresetb);
    parameter DSIZE = 8;
    parameter ASIZE = 4;
    parameter MEMDEPTH = 1 << ASIZE;
@@ -36,7 +36,7 @@ module fifo_sim (rdata, wfull, rempty, wdata, winc, wclk, wreset_b, rinc, rclk, 
    end
 
    always @(posedge wclk or negedge rresetb) begin
-      if (!rwesetb) {rwptr3, rwptr2, rwptr1} <= 0;
+      if (!wresetb) {rwptr3, rwptr2, rwptr1} <= 0;
       else          {rwptr3, rwptr2, rwptr1} <= {rwptr2, rwptr1, wptr};
    end
 
@@ -58,7 +58,7 @@ module fifomem #(parameter DATASIZE = 8, ADDRSIZE = 4)
    assign rdata = mem[raddr];
 
    always @(posedge wclk) begin
-      if (wclken && !wfull) mem[addr] <= wdata;
+      if (wclken && !wfull) mem[raddr] <= wdata;
    end
 endmodule // fifomem
 
@@ -70,9 +70,9 @@ module sync_r2w #(parameter ADDRSIZE = 4)
 
    reg [ADDRSIZE:0]    wq1_rptr;
 
-   always @(posedge wclk or negedge resetb) begin
-      if (!resetb) {wq2_rptr, wq1_rptr} <= 0;
-      else         {wq2_rptr, wq1_rptr} <= {wq1_rptr, rptr};
+   always @(posedge wclk or negedge wresetb) begin
+      if (!wresetb) {wq2_rptr, wq1_rptr} <= 0;
+      else          {wq2_rptr, wq1_rptr} <= {wq1_rptr, rptr};
    end
 endmodule
 
@@ -84,7 +84,7 @@ module sync_w2r #(parameter ADDRSIZE = 4)
    reg [ADDRSIZE:0]    rq1_wptr;
    
    always @(posedge rclk or negedge rresetb)
-     if (!resetb) {rq2_wptr,rq1_wptr} <= 0;
+     if (!rresetb) {rq2_wptr,rq1_wptr} <= 0;
      else         {rq2_wptr,rq1_wptr} <= {rq1_wptr,wptr};
 endmodule // sync_w2r
 
@@ -99,7 +99,7 @@ module rptr_empty #(parameter ADDRSIZE = 4)
    wire [ADDRSIZE:0] rgraynext, rbinnext;
 
    always @(posedge rclk or negedge rresetb) begin
-      if (!resetb) {rbin, rptr} <= 0;
+      if (!rresetb) {rbin, rptr} <= 0;
       else {rbin, rptr} <= {rbinnext, rgraynext};
    end
 
