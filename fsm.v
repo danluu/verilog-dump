@@ -50,6 +50,7 @@ module fsm1 (ds, rd, go, ws, clk, resetb);
      DONE = 2'b11;
    
    reg [1:0] state, next;
+   reg 	     ds, rd;   
 
    always @(posedge clk or negedge resetb) begin
       if (!resetb) state <= IDLE;
@@ -64,27 +65,28 @@ module fsm1 (ds, rd, go, ws, clk, resetb);
 	IDLE: 
 	  if (go) next = READ;
 	  else    next = IDLE;
-	READ:
+	READ: begin
 	  rd = 1'b1;
 	  next = DLY;
-	DLY:
+	end
+	DLY: begin
 	  rd = 1'b1;
 	  if (ws) next = READ;
 	  else    next = DONE;
-	DONE:
+	end
+	DONE: begin
 	  ds = 1'b1;
 	  next = IDLE;
+	end
       endcase
    end // always @ (state or go or ws)
-
-   assign rd = (state == READ || state == DLY);
-   assign ds = (state == DONE);
 endmodule
 
 module fsm1b (ds, rd, go, ws, clk, resetb);
    output ds, rd;
    input  go, ws, clk, resetb;
    reg 	  ds, rd;
+   reg [1:0] state, next;
    
    parameter [1:0] IDLE = 2'b00,
      READ = 2'b01,
@@ -100,7 +102,7 @@ module fsm1b (ds, rd, go, ws, clk, resetb);
       next = 2'bx;
       case (state)
 	IDLE: 
-v	  if (go) next = READ;
+	  if (go) next = READ;
 	  else    next = IDLE;
 	READ:
 	  next = DLY;
@@ -124,7 +126,7 @@ v	  if (go) next = READ;
 	   READ:         rd <= 1'b1;
 	   DLY:  if (ws) rd <= 1'b1;
 	        else     ds <= 1'b1;
-	   
+	 endcase
       end
    end
 endmodule
@@ -163,7 +165,7 @@ module fsm1b_encoded (ds, rd, go, ws, clk, resetb);
       endcase
    end // always @ (state or go or ws)
 
-   assign {ds, rd} = state[1:0]
+   assign {ds, rd} = state[1:0];   
 endmodule
 
 
