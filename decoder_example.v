@@ -1,6 +1,6 @@
 module decoder_example(ce0, ce1, cs, en, addr);
    output ce0, ce1, cs;
-   input  en, addr;
+   input  en;
    input [31:30] addr;
    reg 	  ce0, ce1, cs;
 
