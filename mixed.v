@@ -17,7 +17,7 @@ module mixb (q, a, b, clk, resetb);
    reg 	  q, y;
 
    always @(a or b) begin
-      y = a ^ b
+      y = a ^ b;      
    end
      
    always @(clk or negedge resetb) begin
